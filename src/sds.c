@@ -437,6 +437,8 @@ sds sdscatprintf(sds s, const char *fmt, ...) {
  * are often very slow. Moreover directly handling the sds string as
  * new data is concatenated provides a performance improvement.
  *
+ * 需要参考的是他们使用va_系列函数以及如何实现fmt的解析的想法。实现的技巧也非常的有用
+ *
  * However this function only handles an incompatible subset of printf-alike
  * format specifiers:
  *
