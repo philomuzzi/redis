@@ -179,6 +179,7 @@ static intset *intsetUpgradeAndAdd(intset *is, int64_t value) {
     return is;
 }
 
+// 中间插入的时候，需要进行移位
 static void intsetMoveTail(intset *is, uint32_t from, uint32_t to) {
     void *src, *dst;
     uint32_t bytes = intrev32ifbe(is->length)-from;
@@ -270,6 +271,7 @@ int64_t intsetRandom(intset *is) {
    'values' must be an array of int64_t values, of length 'count'.
    Returns the amount of items returned. If this amount is less than 'count',
    then the remaining 'values' are left uninitialized. */
+// [TOLEARN]不知道用途，但是不明觉厉
 int intsetRandomMembers(intset *is, int64_t* values, int count) {
 
     /* We don't check that is and values are non-NULL - the caller must

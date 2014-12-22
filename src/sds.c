@@ -295,6 +295,8 @@ sds sdscpy(sds s, const char *t) {
  * conversion. 's' must point to a string with room for at least
  * SDS_LLSTR_SIZE bytes.
  *
+ * 原来redis转换数字到字符串也要这样做啊！
+ *
  * The function returns the length of the null-terminated string
  * representation stored at 's'. */
 #define SDS_LLSTR_SIZE 21
@@ -369,7 +371,9 @@ sds sdsfromlonglong(long long value) {
     return sdsnewlen(buf,len);
 }
 
-/* Like sdscatprintf() but gets va_list instead of being variadic. */
+/* Like sdscatprintf() but gets va_list instead of being variadic. 
+ * [TOLEARN]vsnprintf系列的函数是如何使用的，也需要了解
+ * */
 sds sdscatvprintf(sds s, const char *fmt, va_list ap) {
     va_list cpy;
     char staticbuf[1024], *buf = staticbuf, *t;
@@ -437,7 +441,7 @@ sds sdscatprintf(sds s, const char *fmt, ...) {
  * are often very slow. Moreover directly handling the sds string as
  * new data is concatenated provides a performance improvement.
  *
- * 需要参考的是他们使用va_系列函数以及如何实现fmt的解析的想法。实现的技巧也非常的有用
+ * [TOLEARN]需要参考的是他们使用va_系列函数以及如何实现fmt的解析的想法。实现的技巧也非常的有用
  *
  * However this function only handles an incompatible subset of printf-alike
  * format specifiers:
@@ -741,6 +745,8 @@ void sdsfreesplitres(sds *tokens, int count) {
  * all the non-printable characters (tested with isprint()) are turned into
  * escapes in the form "\n\r\a...." or "\x<hex-number>".
  *
+ * 假设s是已经转义的，这里只是操作p而已，具体情境还需要结合使用分析，不能理解用途
+ *
  * After the call, the modified sds string is no longer valid and all the
  * references must be substituted with the new pointer returned by the call. */
 sds sdscatrepr(sds s, const char *p, size_t len) {
@@ -817,6 +823,8 @@ int hex_digit_to_int(char c) {
  * input string is empty, or NULL if the input contains unbalanced
  * quotes or closed quotes followed by non space characters
  * as in: "foo"bar or "foo'
+ *
+ * 这里要的是条理清晰，难度不在于代码，而在于理解了问题，思维缜密
  */
 sds *sdssplitargs(const char *line, int *argc) {
     const char *p = line;
@@ -856,6 +864,7 @@ sds *sdssplitargs(const char *line, int *argc) {
                         case 't': c = '\t'; break;
                         case 'b': c = '\b'; break;
                         case 'a': c = '\a'; break;
+                                  // 不当它是转义，或者认为是错误的转义
                         default: c = *p; break;
                         }
                         current = sdscatlen(current,&c,1);
